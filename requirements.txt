@@ -1,0 +1,6 @@
+autopep8
+mypy
+dash
+dash-bootstrap-components
+pandas
+python-dotenv

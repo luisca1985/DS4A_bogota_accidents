@@ -88,7 +88,7 @@ Deactivate virtual environment
 deactivate
 ```
 
-#### Intall packages
+#### Install packages
 
 ```bash
 pip install -r requirements.txt

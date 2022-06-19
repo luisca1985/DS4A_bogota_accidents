@@ -93,3 +93,13 @@ deactivate
 ```bash
 pip install -r requirements.txt
 ```
+
+## Run the Application
+
+Go to the navigator and text
+
+```http
+http://0.0.0.0:8050/
+```
+
+![alt text](readmepics/graph_test.png)

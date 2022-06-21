@@ -16,23 +16,12 @@ app.title = 'Bogotá - Accidents'
 
 app.layout = dbc.Container(
     [
-        html.H1(['Bogotá Accidents'],
-                className='h-100 p-5 bg-light border rounded-3'),
-        html.Div(children='''
-            Dash: A web application framework for Python.
-        '''),
-        dcc.Graph(
-            id='example-graph',
-            figure={
-                'data': [
-                    {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
-                    {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'}
-                ],
-                'layout': {
-                    'title': 'Dash Data Visualization'
-                }
-            }
-        )
+        dbc.Row("Titulo"),
+        dbc.Row([
+            dbc.Col("Menú Lateral", md=3),
+            dbc.Col("Contenido", md=9)
+        ]),
+        dbc.Row("Pie de Página")
 
     ]
 )

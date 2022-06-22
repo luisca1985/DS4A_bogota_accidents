@@ -49,7 +49,7 @@ Displays log output from services and follows it.
 ```
 docker-compose logs -f
 ```
-
+F de f 
 #### Attach to the application
 
 Attach to the containers.

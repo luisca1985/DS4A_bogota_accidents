@@ -93,6 +93,20 @@ deactivate
 ```
 #### Windows
 
+```
+pip install virtualenv
+```
+```
+virtualenv .venv
+```
+```
+.venv/Scripts/activate
+```
+Should you have any problem, execute:
+```
+Set-ExecutionPolicy Unrestricted -Scope Process
+```
+
 #### Install packages
 
 ```bash

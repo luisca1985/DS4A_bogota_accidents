@@ -32,6 +32,10 @@ VAR="value of the variable"
 ### Docker
 #### Run the application
 
+```
+docker-compose up --build
+```
+
 Build the images and run the containers in the background.
 
 ```

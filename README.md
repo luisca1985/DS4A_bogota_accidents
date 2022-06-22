@@ -72,8 +72,8 @@ Get an interactive prompt for the application
 docker-compose exec app bash
 ```
 
-### Virtual Environment (Linux and Mac)
-
+### Virtual Environment
+#### Linux and Mac
 Create virtual environment
 
 ```bash
@@ -90,6 +90,21 @@ Deactivate virtual environment
 
 ```bash
 deactivate
+```
+#### Windows
+
+```
+pip install virtualenv
+```
+```
+virtualenv .venv
+```
+```
+.venv/Scripts/activate
+```
+Should you have any problem, execute:
+```
+Set-ExecutionPolicy Unrestricted -Scope Process
 ```
 
 #### Install packages

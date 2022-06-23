@@ -1,13 +1,17 @@
 import dash
 from dash_labs.plugins import register_page
+import pandas as pd
 
 register_page(__name__, path="/heatmaps")
 
 from dash import Dash, dcc, html, Input, Output, callback
 import plotly.express as px
 
+from data.clean import get_data_cleaned
+
 # https://plotly.com/python/px-arguments/
-df = px.data.medals_wide(indexed=True)
+# df = px.data.medals_wide(indexed=True)
+df = get_data_cleaned()
 
 layout = html.Div(
     [
@@ -15,12 +19,12 @@ layout = html.Div(
         dcc.Dropdown(
                     id="heatmaps-medals",
                     options=[
-                        {"label": "GOLD", "value": "gold"},
-                        {"label": "SILVER", "value": "silver"},
-                        {"label": "BRONZE", "value": "bronze"},
+                        {"label": "CHAPINERO", "value": "CHAPINERO"},
+                        {"label": "USAQUEN", "value": "USAQUEN"},
+                        {"label": "FONTIBON", "value": "FONTIBON"},
                     ],
-                    value=['gold', 'silver', 'bronze'],
-                    multi = True
+                    # value=['CHAPINERO', 'USAQUEN', 'FONTIBON'],
+                    multi = False
                 ),
         dcc.Graph(id="heatmaps-graph"),
     ], className='card'
@@ -29,8 +33,19 @@ layout = html.Div(
 @callback(
     Output("heatmaps-graph", "figure"), 
     Input("heatmaps-medals", "value"))
-def filter_heatmap(cols):
-    
+def filter_heatmap(borough):
+    df2=df[df['borough']==borough]
+    seg = df2.groupby(['year','month']).size().to_frame('number_of_accident').reset_index()
+    seg['year'] = seg['year'].astype('category')
+    fig = px.bar(seg, x='month', y='number_of_accident', color='year', text_auto=True, labels={
+                        'month': '',
+                        'number_of_accident': 'NUMBER OF ACCIDENTS',
+                        'year': 'Select one/multiple years'
+                    },
+                    title='ACCIDENTS PER YEAR')
+    # fig.show()
+
+
     # https://plotly.com/python/imshow/
-    fig = px.imshow(df[cols])
+    # fig = px.imshow(df.head()[cols])
     return fig

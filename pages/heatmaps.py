@@ -34,7 +34,11 @@ layout = html.Div(
     Output("heatmaps-graph", "figure"),
     Input("heatmaps-medals", "value"))
 def filter_heatmap(borough):
-    df2 = df[df['borough'] == borough]
+    if borough:
+        df2 = df[df['borough'] == borough]
+    else:
+        df2 = df
+        
     seg = df2.groupby(['year', 'month']).size().to_frame(
         'number_of_accident').reset_index()
     seg['year'] = seg['year'].astype('category')

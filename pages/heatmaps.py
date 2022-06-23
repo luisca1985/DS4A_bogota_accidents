@@ -6,6 +6,7 @@ register_page(__name__, path="/heatmaps")
 from dash import Dash, dcc, html, Input, Output, callback
 import plotly.express as px
 
+# https://plotly.com/python/px-arguments/
 df = px.data.medals_wide(indexed=True)
 
 layout = html.Div(
@@ -29,5 +30,7 @@ layout = html.Div(
     Output("heatmaps-graph", "figure"), 
     Input("heatmaps-medals", "value"))
 def filter_heatmap(cols):
+    
+    # https://plotly.com/python/imshow/
     fig = px.imshow(df[cols])
     return fig

@@ -121,4 +121,4 @@ Go to the navigator and text
 http://0.0.0.0:8050/
 ```
 
-![alt text](readmepics/FrontendHtml.png)
+![alt text](readmepics/FrontendHtml.gif)

@@ -28,7 +28,7 @@ navbar = dbc.NavbarSimple(
     dbc.NavItem(dbc.NavLink("Nosotros", href="/nosotros")),
     ],
     brand="Analyzing Traffic Accidents in Bogota during 2015 to 2021",
-    color="primary",
+    color="#FAC63F",
     dark=True,
     className="mb-2",
 )

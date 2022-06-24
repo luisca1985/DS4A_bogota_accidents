@@ -20,6 +20,8 @@ kpi4 = kpibadge('FRIDAY', 'Day with more accidents', 'Danger')
 mapa_ejemplo = mapsample('Mapa de ejemplo', 'id_mapa_ejemplo')
 
 df = get_data_cleaned()
+boroughs = df['borough'].unique()
+accident_types = df['accident_type'].unique()
 
 
 contenido =  html.Div(
@@ -73,14 +75,25 @@ check_month = dcc.Dropdown(
     multi=False
 )
 
-check_borough = dcc.Checklist(
-    df['borough'].unique(),
-    inline=False
+
+checklist_borough = html.Div(
+    [
+        dbc.Checklist(
+            options=[ {"label": borough, "value": borough}  for borough in boroughs],
+            value=[boroughs[0]],
+            id="checklist-borough",
+        ),
+    ]
 )
 
-check_accidents_type = dcc.Checklist(
-    df['accident_type'].unique(),
-    style=chkclass,
+check_accidents_type = html.Div(
+    [
+        dbc.Checklist(
+            options=[ {"label": accident_type, "value": accident_type}  for accident_type in accident_types],
+            value=[accident_types[0]],
+            id="checklist-accident-type",
+        ),
+    ]
 )
 
 sidebar = html.Div(
@@ -98,9 +111,9 @@ sidebar = html.Div(
         check_month,
         html.Hr(),
         html.H5(
-            "Boroug"
+            "Borough"
         ),
-        check_borough,
+        checklist_borough,
         html.Hr(),
         html.H5(
             "Accident type"

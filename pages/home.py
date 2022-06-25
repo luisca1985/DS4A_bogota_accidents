@@ -4,6 +4,7 @@ from dash import Dash, dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
 from dash_labs.plugins import register_page
 import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 
 
@@ -47,6 +48,11 @@ contenido =  html.Div(
                 dcc.Graph(id="accidents-per-year-graph")
             ], xs=12, className='card')
         ]),
+        dbc.Row([
+            dbc.Col([
+                dcc.Graph(id="time-series")
+            ], xs=12, className='card')
+        ])
     ]
 ) 
 
@@ -67,13 +73,14 @@ chkclass={
 
 check_year = dcc.Dropdown(
     options=sorted(list(range(2015,2022)),reverse=True),
-    value=[2021],
+    value=[],
     multi=True,
     id="year"
 )
 
 check_month = dcc.Dropdown(
     df['month'].unique(),
+    value=[],
     multi=True,
     id="month"
 )
@@ -83,7 +90,7 @@ checklist_borough = html.Div(
     [
         dbc.Checklist(
             options=[ {"label": borough, "value": borough}  for borough in boroughs],
-            value=[boroughs[0]],
+            value=[],
             id="borough",
         ),
     ]
@@ -93,7 +100,7 @@ check_accidents_type = html.Div(
     [
         dbc.Checklist(
             options=[ {"label": accident_type, "value": accident_type}  for accident_type in accident_types],
-            value=[accident_types[0]],
+            value=[],
             id="accident-type",
         ),
     ]
@@ -164,4 +171,45 @@ def filter_accidents(borough,accident_type,year,month):
 
     # https://plotly.com/python/imshow/
     # fig = px.imshow(df.head()[cols])
+    return fig
+
+@callback(
+    Output("time-series", "figure"),
+    Input("borough", "value"), 
+    Input("accident-type", "value"),
+    Input("year", "value"),
+    Input("month", "value"))
+def time_series(borough,accident_type,year,month):
+    df2 = df[df['borough'].isin(borough)] if borough else df
+    df2 = df2[df2['accident_type'].isin(accident_type)] if accident_type else df2
+    df2 = df2[df2['year'].isin(year)] if year else df2
+    df2 = df2[df2['month'].isin(month)] if month else df2
+
+    df2['id_ones'] = 1
+
+    df3 = df2.groupby(["year", "accident_type"])["id_ones"].sum()
+    df3 =df3.reset_index()
+
+
+    fig = go.Figure()
+    accident_type_list = list(df2['accident_type'].unique())
+    for accident_type in accident_type_list:
+        fig.add_trace(
+            go.Scatter(
+                x = df3['year'][df3['accident_type'] == accident_type],
+                y = df3['id_ones'][df3['accident_type'] == accident_type],
+                name = accident_type)
+        )
+
+    fig.update_layout(
+        autosize=False,
+        title_text='NUMBER OF ACCIDENT BY TYPE',
+        title_x = 0.45,
+        # font_family="Courier New",
+        # font_color="grey",
+        # title_font_family="Times New Roman",
+        # title_font_color="grey"
+    )
+
+
     return fig

@@ -7,6 +7,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import matplotlib.pyplot as plt
+import pyproj
 
 
 register_page(__name__, path="/")
@@ -233,11 +234,15 @@ def map(borough,accident_type,year,month):
     df2 = df2[df2['year'].isin(year)] if year else df2
     df2 = df2[df2['month'].isin(month)] if month else df2
 
-    print(geo_df.head(10))
+    df_borough_total = df2.groupby(['borough']).size().to_frame('num_accidents').reset_index()
+    accidents_total = geo_df.merge(df_borough_total, how="left", left_on=['borough'], right_on=['borough'])
 
-    fig, ax = plt.subplots(figsize = (10,10))
-    # geo_df.to_crs(epsg=4326).plot(ax=ax, color='lightgrey')
+    accidents_total.to_crs(pyproj.CRS.from_epsg(4326), inplace=True)
+    fig = px.choropleth(accidents_total, geojson=accidents_total.geometry, color="num_accidents", locations=accidents_total.index)
+    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_layout(
+        autosize=False,
+        title_text='GEO SPACIAL ANALYSIS'
+    )
 
-    # fig = geo_df.plot(column='borough', edgecolor='black',linewidth=1,cmap='Set2',figsize=(20,15))
-
-    # return fig
+    return fig

@@ -44,7 +44,7 @@ contenido =  html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="accidents-per-year")
+                dcc.Graph(id="accidents-per-year-graph")
             ], xs=12, className='card')
         ]),
     ]

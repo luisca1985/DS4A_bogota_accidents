@@ -5,3 +5,5 @@ dash-bootstrap-components
 pandas
 python-dotenv
 dash-labs
+geopandas
+matplotlib

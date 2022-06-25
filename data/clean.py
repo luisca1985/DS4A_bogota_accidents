@@ -1,4 +1,5 @@
 import pandas as pd
+import geopandas as gpd
 
 def get_data_cleaned():
     df = pd.read_csv ('data/historico_siniestros_bogota.csv', delimiter=',')
@@ -58,4 +59,15 @@ def get_data_cleaned():
     df["day_of_week"] = df["full_date"].dt.day_name()
     df["hour"] = df["full_date"].dt.hour
 
-    return df
+    # Loading the shape file for Bogotá polygons of boroughs
+    shp_df = gpd.read_file('data/localidades/localidades.shp')
+    # Cleaning the dataframe before merging
+    shp_df = shp_df.drop(["OBJECTID","CODIGO_LOC","DECRETO","LINK","SIMBOLO","ESCALA_CAP","FECHA_CAPT", "SHAPE_LEN"], axis=1)
+    geo_columns_dict = {"NOMBRE":"borough", "SHAPE_AREA":"shape_area"}
+    shp_df = shp_df.rename(columns = geo_columns_dict)
+
+    #Merging accident counts and shapefile
+    df_borough = df.groupby("borough")['year'].count().reset_index(name="accident_count")
+    geospatial_df = shp_df.merge(df_borough, how="left", left_on=['borough'], right_on=['borough'])
+
+    return df, geospatial_df

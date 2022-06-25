@@ -14,7 +14,7 @@ df = get_data_cleaned()
 
 layout = html.Div(
     [
-        html.P("Medals included:"),
+        html.P("Boroughs included:"),
         dcc.Dropdown(
             id="heatmaps-medals",
             options=[
@@ -34,11 +34,8 @@ layout = html.Div(
     Output("heatmaps-graph", "figure"),
     Input("heatmaps-medals", "value"))
 def filter_heatmap(borough):
-    if borough:
-        df2 = df[df['borough'] == borough]
-    else:
-        df2 = df
-        
+    df2 = df[df['borough'] == borough] if borough else df
+ 
     seg = df2.groupby(['year', 'month']).size().to_frame(
         'number_of_accident').reset_index()
     seg['year'] = seg['year'].astype('category')
@@ -53,3 +50,5 @@ def filter_heatmap(borough):
     # https://plotly.com/python/imshow/
     # fig = px.imshow(df.head()[cols])
     return fig
+
+

@@ -1,8 +1,10 @@
 from data.clean import get_data_cleaned
 import dash
-from dash import html , dcc
+from dash import Dash, dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
 from dash_labs.plugins import register_page
+import plotly.express as px
+import pandas as pd
 
 
 register_page(__name__, path="/")
@@ -42,9 +44,9 @@ contenido =  html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                mapa_ejemplo.display()
-            ], xs=12, className='card'),            
-        ]),     
+                dcc.Graph(id="accidents-per-year")
+            ], xs=12, className='card')
+        ]),
     ]
 ) 
 
@@ -64,15 +66,16 @@ chkclass={
 
 
 check_year = dcc.Dropdown(
-    id="heatmaps-medals",
     options=sorted(list(range(2015,2022)),reverse=True),
     value=[2021],
-    multi=True
+    multi=True,
+    id="year"
 )
 
 check_month = dcc.Dropdown(
     df['month'].unique(),
-    multi=False
+    multi=True,
+    id="month"
 )
 
 
@@ -81,7 +84,7 @@ checklist_borough = html.Div(
         dbc.Checklist(
             options=[ {"label": borough, "value": borough}  for borough in boroughs],
             value=[boroughs[0]],
-            id="checklist-borough",
+            id="borough",
         ),
     ]
 )
@@ -91,7 +94,7 @@ check_accidents_type = html.Div(
         dbc.Checklist(
             options=[ {"label": accident_type, "value": accident_type}  for accident_type in accident_types],
             value=[accident_types[0]],
-            id="checklist-accident-type",
+            id="accident-type",
         ),
     ]
 )
@@ -136,3 +139,29 @@ layout = dbc.Container(
     ]
 
 )
+
+@callback(
+    Output("accidents-per-year-graph", "figure"),
+    Input("borough", "value"), 
+    Input("accident-type", "value"),
+    Input("year", "value"),
+    Input("month", "value"))
+def filter_accidents(borough,accident_type,year,month):
+    df2 = df[df['borough'].isin(borough)] if borough else df
+    df2 = df2[df2['accident_type'].isin(accident_type)] if accident_type else df2
+    df2 = df2[df2['year'].isin(year)] if year else df2
+    df2 = df2[df2['month'].isin(month)] if month else df2
+    seg = df2.groupby(['year', 'month']).size().to_frame(
+        'number_of_accident').reset_index()
+    seg['year'] = seg['year'].astype('category')
+    fig = px.bar(seg, x='month', y='number_of_accident', color='year', text_auto=True, labels={
+                        'month': '',
+                        'number_of_accident': 'NUMBER OF ACCIDENTS',
+                        'year': 'Select one/multiple years'
+    },
+        title='ACCIDENTS PER YEAR')
+    # fig.show()
+
+    # https://plotly.com/python/imshow/
+    # fig = px.imshow(df.head()[cols])
+    return fig

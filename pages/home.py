@@ -47,19 +47,20 @@ contenido =  html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="accidents-per-year-graph")
-            ], xs=12, className='card')
-        ]),
-        dbc.Row([
+                dbc.Row([
+                    dcc.Graph(id="accidents-per-year-graph")
+                ], className='card'),
+                dbc.Row([
+                    dcc.Graph(id="time-series")
+                ], className='card')
+                ], lg=6),
             dbc.Col([
-                dcc.Graph(id="time-series")
-            ], xs=12, className='card')
+                dbc.Row([
+                    dcc.Graph(id="map")
+                ], className='card')
+            ], lg=6)
+
         ]),
-        dbc.Row([
-            dbc.Col([
-                dcc.Graph(id="map")
-            ], xs=12, className='card')
-        ])
     ]
 ) 
 
@@ -146,8 +147,8 @@ layout = dbc.Container(
     [
         dbc.Row(
             [
-                dbc.Col(sidebar, md=3),
-                dbc.Col(contenido, md=9)
+                dbc.Col(sidebar, md=2),
+                dbc.Col(contenido, md=10)
             ]
         )
     ]
@@ -168,13 +169,20 @@ def filter_accidents(borough,accident_type,year,month):
     seg = df2.groupby(['year', 'month']).size().to_frame(
         'number_of_accident').reset_index()
     seg['year'] = seg['year'].astype('category')
+    
     fig = px.bar(seg, x='month', y='number_of_accident', color='year', text_auto=True, labels={
                         'month': '',
                         'number_of_accident': 'NUMBER OF ACCIDENTS',
                         'year': 'Select one/multiple years'
-    },
-        title='ACCIDENTS PER YEAR')
-    # fig.show()
+    },title='ACCIDENTS PER YEAR')
+
+    fig.update_layout(legend=dict(
+        # orientation="h",
+        yanchor="top",
+        y=0.99,
+        xanchor="left",
+        x=0.01
+        ))
 
     # https://plotly.com/python/imshow/
     # fig = px.imshow(df.head()[cols])

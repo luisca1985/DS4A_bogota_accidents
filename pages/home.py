@@ -146,8 +146,8 @@ layout = dbc.Container(
     [
         dbc.Row(
             [
-                dbc.Col(sidebar, md=3),
-                dbc.Col(contenido, md=9)
+                dbc.Col(sidebar, md=2),
+                dbc.Col(contenido, md=10)
             ]
         )
     ]

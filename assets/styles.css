@@ -64,3 +64,17 @@ body #_pages_plugin_content {
 .mb-2{
     margin-bottom: 0!important;
 }
+
+.kpi  {
+    background-color: #FCA91F;
+    color: #FFF;
+}
+
+#_pages_plugin_content  {
+    color: #fff;
+    padding-top: 15px;
+}
+
+.dropboxes{
+    color: #424242 !important;
+}

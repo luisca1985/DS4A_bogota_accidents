@@ -34,16 +34,16 @@ contenido =  html.Div(
         dbc.Row([
             dbc.Col([
                 kpi1.display()
-            ], className='card'),
+            ], className='card kpi'),
             dbc.Col([
                 kpi2.display()
-            ], className='card'),
+            ], className='card kpi'),
             dbc.Col([
                 kpi3.display()
-            ], className='card'),
+            ], className='card kpi'),
             dbc.Col([
                 kpi4.display()
-            ], className='card')
+            ], className='card kpi')
         ]),
         dbc.Row([
             dbc.Col([
@@ -60,7 +60,8 @@ contenido =  html.Div(
                 dcc.Graph(id="map")
             ], xs=12, className='card')
         ])
-    ]
+    ],
+    className="Alejandro"
 ) 
 
 # SIDEBAR_STYLE = {
@@ -82,14 +83,16 @@ check_year = dcc.Dropdown(
     options=sorted(list(range(2015,2022)),reverse=True),
     value=[],
     multi=True,
-    id="year"
+    id="year",
+    className="dropboxes"
 )
 
 check_month = dcc.Dropdown(
     df['month'].unique(),
     value=[],
     multi=True,
-    id="month"
+    id="month",
+    className="dropboxes"
 )
 
 
@@ -99,6 +102,7 @@ checklist_borough = html.Div(
             options=[ {"label": borough, "value": borough}  for borough in boroughs],
             value=[],
             id="borough",
+            
         ),
     ]
 )

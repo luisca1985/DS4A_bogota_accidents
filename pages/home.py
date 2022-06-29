@@ -5,7 +5,6 @@ import dash_bootstrap_components as dbc
 from dash_labs.plugins import register_page
 import plotly.express as px
 import plotly.graph_objects as go
-import pandas as pd
 import matplotlib.pyplot as plt
 import pyproj
 
@@ -17,10 +16,10 @@ from components.maps.mapsample import mapsample
 import pandas as pd
 
 
-kpi1 = kpibadge('KENNEDY', 'Accident Hotspot', 'Danger')
-kpi2 = kpibadge('CRASH', 'Most Common Accident Type', 'Approved')
-kpi3 = kpibadge('NOV, 2016', 'Date Peak', 'Approved')
-kpi4 = kpibadge('FRIDAY', 'Day with more accidents', 'Danger')
+kpi1 = kpibadge('KENNEDY', 'Accident Hotspot', 'Danger', id="max-borough")
+kpi2 = kpibadge('CRASH', 'Most Common Accident Type', 'Approved', id='max-type-accident')
+kpi3 = kpibadge('NOV, 2016', 'Date Peak', 'Approved', id='max-date')
+kpi4 = kpibadge('FRIDAY', 'Day with more accidents', 'Danger', id='max-day')
 
 mapa_ejemplo = mapsample('Mapa de ejemplo', 'id_mapa_ejemplo')
 
@@ -58,6 +57,16 @@ contenido =  html.Div(
         dbc.Row([
             dbc.Col([
                 dcc.Graph(id="map")
+            ], xs=12, className='card')
+        ]),
+        dbc.Row([
+            dbc.Col([
+                dcc.Graph(id="heat-map-month")
+            ], xs=12, className='card')
+        ]),
+        dbc.Row([
+            dbc.Col([
+                dcc.Graph(id="heat-map-hour")
             ], xs=12, className='card')
         ])
     ],
@@ -250,3 +259,54 @@ def map(borough,accident_type,year,month):
     )
 
     return fig
+
+
+@callback(
+    Output("heat-map-month", "figure"),
+    Output("heat-map-hour", "figure"),
+    Input("borough", "value"), 
+    Input("accident-type", "value"),
+    Input("year", "value"),
+    Input("month", "value"))
+def heat_map(borough,accident_type,year,month):
+    df2 = df[df['borough'].isin(borough)] if borough else df
+    df2 = df2[df2['accident_type'].isin(accident_type)] if accident_type else df2
+    df2 = df2[df2['year'].isin(year)] if year else df2
+    df2 = df2[df2['month'].isin(month)] if month else df2
+
+    dow = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    df2['day_of_week']= pd.Categorical(df2['day_of_week'], categories=dow, ordered=True)
+    contingency_table = pd.crosstab(index = df2['month'], columns = df2['day_of_week'], normalize="index")*100
+    fig_month = px.imshow(contingency_table, text_auto=False, width=800, height=400)
+
+    contingency_table2 = pd.crosstab(index = df2['hour'], columns = df2['day_of_week'], normalize="columns")*100
+    fig_hour = px.imshow(contingency_table2, text_auto=False, width=800, height=400)
+    
+    return fig_month, fig_hour
+
+
+@callback(
+    Output("max-borough", "value"),
+    Output("max-type-accident", "label"),
+    Output("max-date", "value"),
+    Output("max-day", "value"),
+    Input("borough", "value"), 
+    Input("accident-type", "value"),
+    Input("year", "value"),
+    Input("month", "value"))
+def kpis(borough,accident_type,year,month):
+    df2 = df[df['borough'].isin(borough)] if borough else df
+    df2 = df2[df2['accident_type'].isin(accident_type)] if accident_type else df2
+    df2 = df2[df2['year'].isin(year)] if year else df2
+    df2 = df2[df2['month'].isin(month)] if month else df2
+
+    count = df2.groupby(["borough"]).value_counts()
+    print(f'Count: { count }')
+    
+    max_borough = 'Prueba1'
+    max_type_accident = 'Prueba2'
+    max_date = 'Prueba3'
+    max_day = 'Prueba4'
+
+    
+    return max_borough, max_type_accident, max_date, max_day

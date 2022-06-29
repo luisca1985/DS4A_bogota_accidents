@@ -58,6 +58,7 @@ def get_data_cleaned():
     df['month']= pd.Categorical(df['month'], categories=mon, ordered=True)
     df["day_of_week"] = df["full_date"].dt.day_name()
     df["hour"] = df["full_date"].dt.hour
+    df["month_year"] = df["month"].astype(str).str[:3] + ", " + df["year"].astype(str)
 
     # Loading the shape file for Bogotá polygons of boroughs
     shp_df = gpd.read_file('data/localidades/localidades.shp')

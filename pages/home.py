@@ -16,10 +16,10 @@ from components.maps.mapsample import mapsample
 import pandas as pd
 
 
-kpi1 = kpibadge('KENNEDY', 'Accident Hotspot', 'Danger', id="max-borough")
-kpi2 = kpibadge('CRASH', 'Most Common Accident Type', 'Approved', id='max-type-accident')
-kpi3 = kpibadge('NOV, 2016', 'Date Peak', 'Approved', id='max-date')
-kpi4 = kpibadge('FRIDAY', 'Day with more accidents', 'Danger', id='max-day')
+kpi1 = kpibadge('KENNEDY', 'Accident Hotspot', id="max-borough")
+kpi2 = kpibadge('CRASH', 'Most Common Accident Type', id='max-type-accident')
+kpi3 = kpibadge('NOV, 2016', 'Date Peak', id='max-date')
+kpi4 = kpibadge('FRIDAY', 'Day with more accidents', id='max-day')
 
 mapa_ejemplo = mapsample('Mapa de ejemplo', 'id_mapa_ejemplo')
 
@@ -286,10 +286,10 @@ def heat_map(borough,accident_type,year,month):
 
 
 @callback(
-    Output("max-borough", "value"),
-    Output("max-type-accident", "label"),
-    Output("max-date", "value"),
-    Output("max-day", "value"),
+    Output("max-borough", "children"),
+    Output("max-type-accident", "children"),
+    Output("max-date", "children"),
+    Output("max-day", "children"),
     Input("borough", "value"), 
     Input("accident-type", "value"),
     Input("year", "value"),
@@ -300,13 +300,9 @@ def kpis(borough,accident_type,year,month):
     df2 = df2[df2['year'].isin(year)] if year else df2
     df2 = df2[df2['month'].isin(month)] if month else df2
 
-    count = df2.groupby(["borough"]).value_counts()
-    print(f'Count: { count }')
-    
-    max_borough = 'Prueba1'
-    max_type_accident = 'Prueba2'
-    max_date = 'Prueba3'
-    max_day = 'Prueba4'
-
+    max_borough = df2["borough"].value_counts().reset_index()["index"][0]
+    max_type_accident = df2["accident_type"].value_counts().reset_index()["index"][0].upper()
+    max_date = df2["month_year"].value_counts().reset_index()["index"][0].upper()
+    max_day = df2["day_of_week"].value_counts().reset_index()["index"][0].upper()
     
     return max_borough, max_type_accident, max_date, max_day

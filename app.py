@@ -20,7 +20,8 @@ navbar = dbc.Navbar(
                 dbc.Row(
                     [
                         dbc.Col(html.Img(src=PLOTLY_LOGO, height="30px")),
-                        dbc.Col(dbc.NavbarBrand("Analyzing Traffic Accidents in Bogota during 2015 to 2021", className="ms-8")),
+                        dbc.Col(dbc.NavbarBrand("Analyzing Traffic Accidents in Bogota during 2015 to 2021", className="ms-8 d-none d-lg-block")),
+                        dbc.Col(dbc.NavbarBrand("Traffic Accidents in Bogota", className="ms-8 d-md-block d-lg-none")),
                     ],
                     align="center",
                     className="g-4",
@@ -28,18 +29,18 @@ navbar = dbc.Navbar(
                 href="https://plotly.com",
                 style={"textDecoration": "none", "color":"#424242"},
             ),
-            dbc.NavItem(dbc.NavLink( "Inicio", href='/'),className="g-0 ms-auto flex-nowrap mt-3 mt-md-0"),
-            dbc.NavItem(dbc.NavLink("Nosotros", href="/nosotros")),
-            dbc.DropdownMenu(
-                [
+            dbc.NavItem(dbc.NavLink( "Inicio", href='/'),className="g-0 ms-auto flex-nowrap mt-3 mt-md-0 d-none d-lg-block d-xl-block"),
+            dbc.NavItem(dbc.NavLink("Nosotros", href="/nosotros"), class_name='d-none d-lg-block d-xl-block'),
+            # dbc.DropdownMenu(
+            #     [
                     
-                    dbc.DropdownMenuItem(page["name"], href=page["path"])
-                    for page in dash.page_registry.values()
-                    if page["module"] != "pages.not_found_404"
-                ],
-                nav=True,
-                label="Data Science",
-            ),
+            #         dbc.DropdownMenuItem(page["name"], href=page["path"])
+            #         for page in dash.page_registry.values()
+            #         if page["module"] != "pages.not_found_404"
+            #     ],
+            #     nav=True,
+            #     label="Data Science",
+            # ),
         ]
     ),
     fixed='top',

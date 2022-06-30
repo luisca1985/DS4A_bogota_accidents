@@ -12,8 +12,8 @@ class kpibadge:
     def display(self):
         layout = html.Div(
             [
+             html.H2(self.kpi,id =f'{self.id}' ,className='d-flex justify-content'),
              html.Div(self.label,className='h6'),
-             html.H2(self.kpi,id =f'{self.id}' ,className='d-flex justify-content-end'),
             ], className='m-2'
         )
         return layout

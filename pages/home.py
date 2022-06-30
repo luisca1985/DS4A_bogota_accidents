@@ -32,17 +32,19 @@ content =  html.Div(
     [
         dbc.Row([
             dbc.Col([
+                dbc.Row([
                 kpi1.display()
-            ], className='card kpi'),
+                ])
+            ], className='card kpi', xl = 3, lg=6, xs=12),
             dbc.Col([
                 kpi2.display()
-            ], className='card kpi'),
+            ], className='card kpi', xl = 3, lg=6, xs=12),
             dbc.Col([
                 kpi3.display()
-            ], className='card kpi'),
+            ], className='card kpi', xl = 3, lg=6, xs=12),
             dbc.Col([
                 kpi4.display()
-            ], className='card kpi')
+            ], className='card kpi', xl = 3, lg=6, xs=12)
         ]),
         dbc.Row([
             dbc.Col([

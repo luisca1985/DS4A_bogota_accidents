@@ -69,7 +69,7 @@ contenido =  html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                html.H5('Geospatial Analysis'.upper(), className='graph-title'
+                html.H5('Heatmap Analysis'.upper(), className='graph-title'
                 ),
                 dbc.Row([
                     dbc.Col([

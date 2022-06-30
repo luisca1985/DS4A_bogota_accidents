@@ -5,6 +5,7 @@ import dash_bootstrap_components as dbc
 from dash_labs.plugins import register_page
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.graph_objects import Layout
 import matplotlib.pyplot as plt
 import pyproj
 
@@ -24,9 +25,10 @@ kpi4 = kpibadge('FRIDAY', 'Day with more accidents', id='max-day')
 mapa_ejemplo = mapsample('Mapa de ejemplo', 'id_mapa_ejemplo')
 
 df, geo_df = get_data_cleaned()
-boroughs = df['borough'].unique()
-accident_types = df['accident_type'].unique()
-
+boroughs = sorted(df['borough'].unique())
+boroughs = [ b.title() for b in boroughs]
+accident_types = sorted(df['accident_type'].unique())
+accident_types = [ at.title() for at in accident_types]
 
 contenido =  html.Div(
     [
@@ -46,28 +48,38 @@ contenido =  html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="accidents-per-year-graph")
-            ], xs=12, className='card')
+                html.H5('Accidents per Year'.upper(), className='graph-title'
+                ),
+                dcc.Graph(id="accidents-per-year-graph", className='graph')
+            ], xs=12)
         ]),
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="time-series")
-            ], xs=12, className='card')
+                html.H5('Time Series'.upper(), className='graph-title'
+                ),
+                dcc.Graph(id="time-series", className='graph')
+            ], xs=12)
         ]),
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="map")
-            ], xs=12, className='card')
+                html.H5('Geospatial Analysis'.upper(), className='graph-title'
+                ),
+                dcc.Graph(id="map", className='graph')
+            ], xs=12)
         ]),
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="heat-map-month")
-            ], xs=12, className='card')
-        ]),
-        dbc.Row([
-            dbc.Col([
-                dcc.Graph(id="heat-map-hour")
-            ], xs=12, className='card')
+                html.H5('Geospatial Analysis'.upper(), className='graph-title'
+                ),
+                dbc.Row([
+                    dbc.Col([
+                         dcc.Graph(id="heat-map-month"),
+                    ], xs=6),
+                    dbc.Col([
+                         dcc.Graph(id="heat-map-hour")
+                    ], xs=6)
+                ], className='graph')
+            ], xs=12)
         ])
     ],
     className="Alejandro"
@@ -128,25 +140,25 @@ check_accidents_type = html.Div(
 
 sidebar = html.Div(
     [
-        html.H4("Filters"),
-        html.Hr(),
+        # html.H4("Filters"),
+        # html.Hr(),
         html.H5(
-            "Year"
+            "Year".upper()
         ),
         check_year,
         html.Hr(),
         html.H5(
-            "Month"
+            "Month".upper()
         ),
         check_month,
         html.Hr(),
         html.H5(
-            "Borough"
+            "Borough".upper()
         ),
         checklist_borough,
         html.Hr(),
         html.H5(
-            "Accident type"
+            "Accident type".upper()
         ),
         check_accidents_type,
         
@@ -173,7 +185,7 @@ layout = dbc.Container(
     Input("accident-type", "value"),
     Input("year", "value"),
     Input("month", "value"))
-def filter_accidents(borough,accident_type,year,month):
+def bar_plot(borough,accident_type,year,month):
     df2 = df[df['borough'].isin(borough)] if borough else df
     df2 = df2[df2['accident_type'].isin(accident_type)] if accident_type else df2
     df2 = df2[df2['year'].isin(year)] if year else df2
@@ -181,12 +193,18 @@ def filter_accidents(borough,accident_type,year,month):
     seg = df2.groupby(['year', 'month']).size().to_frame(
         'number_of_accident').reset_index()
     seg['year'] = seg['year'].astype('category')
-    fig = px.bar(seg, x='month', y='number_of_accident', color='year', text_auto=True, labels={
-                        'month': '',
-                        'number_of_accident': 'NUMBER OF ACCIDENTS',
-                        'year': 'Select one/multiple years'
-    },
-        title='ACCIDENTS PER YEAR')
+
+    fig = px.bar(seg, x='month', y='number_of_accident', color='year', text_auto=True, 
+        labels={
+            'month': 'Months',
+            'number_of_accident': 'Number of Accidents',
+            'year': 'Years'
+            })
+
+    fig.update_layout(
+        titlefont=dict(size=20, color='#FCA91F', family='Helvetica, sans-serif')
+        )
+        
     # fig.show()
 
     # https://plotly.com/python/imshow/
@@ -222,13 +240,8 @@ def time_series(borough,accident_type,year,month):
         )
 
     fig.update_layout(
-        autosize=False,
-        title_text='NUMBER OF ACCIDENT BY TYPE',
-        title_x = 0.45,
-        # font_family="Courier New",
-        # font_color="grey",
-        # title_font_family="Times New Roman",
-        # title_font_color="grey"
+        yaxis_title="Number of Accidents",
+        xaxis_title="Years"
     )
 
 
@@ -252,10 +265,11 @@ def map(borough,accident_type,year,month):
 
     accidents_total.to_crs(pyproj.CRS.from_epsg(4326), inplace=True)
     fig = px.choropleth(accidents_total, geojson=accidents_total.geometry, color="num_accidents", locations=accidents_total.index)
-    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_geos(fitbounds="locations")
+
     fig.update_layout(
-        autosize=False,
-        title_text='GEO SPACIAL ANALYSIS'
+        yaxis_title="Number of Accidents",
+        xaxis_title="Years"
     )
 
     return fig
@@ -277,10 +291,22 @@ def heat_map(borough,accident_type,year,month):
     dow = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
     df2['day_of_week']= pd.Categorical(df2['day_of_week'], categories=dow, ordered=True)
     contingency_table = pd.crosstab(index = df2['month'], columns = df2['day_of_week'], normalize="index")*100
-    fig_month = px.imshow(contingency_table, text_auto=False, width=800, height=400)
+    fig_month = px.imshow(contingency_table)
+
+    fig_month.update_layout(
+        yaxis_title="Month",
+        xaxis_title="Day of Week"
+
+    )
 
     contingency_table2 = pd.crosstab(index = df2['hour'], columns = df2['day_of_week'], normalize="columns")*100
-    fig_hour = px.imshow(contingency_table2, text_auto=False, width=800, height=400)
+    fig_hour = px.imshow(contingency_table2)
+
+    fig_hour.update_layout(
+        yaxis_title="Hour",
+        xaxis_title="Day of Week"
+
+    )
     
     return fig_month, fig_hour
 

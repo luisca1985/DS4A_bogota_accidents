@@ -15,6 +15,8 @@ def get_data_cleaned():
     df["CIV"] = df["CIV"].fillna("Not Available")
     df["PK_CALZADA"] = df["PK_CALZADA"].astype(str)
     df["PK_CALZADA"] = df["PK_CALZADA"].fillna("Not Available")
+    # Drop NaN
+    df = df[df["LOCALIDAD"].notna()]
 
     # Consistency
     #Convert categorical columns to appropriate data types

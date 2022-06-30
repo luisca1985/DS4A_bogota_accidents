@@ -25,15 +25,23 @@
     margin-bottom: 0rem;
 }
 
-#sidebar {
-    "position": "fixed",
-    "color": 'red',
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "16rem",
-    "padding": "2rem 1rem",
-    "background-color": "#f8f9fa",
+.content{
+    padding: 5rem 2rem 2rem 2rem;
+    position:absolute;
+    left: 16rem;
+    width: calc(100% - 16rem);
+    background-color: #424242;
+}
+
+.sidebar{
+    position: fixed;
+    overflow-y: scroll;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 16rem;
+    padding: 5rem 1rem;
+    background-color: #626262;
 }
 
 .SIDEBAR_STYLE {

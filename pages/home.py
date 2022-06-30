@@ -26,11 +26,9 @@ mapa_ejemplo = mapsample('Mapa de ejemplo', 'id_mapa_ejemplo')
 
 df, geo_df = get_data_cleaned()
 boroughs = sorted(df['borough'].unique())
-boroughs = [ b.title() for b in boroughs]
 accident_types = sorted(df['accident_type'].unique())
-accident_types = [ at.title() for at in accident_types]
 
-contenido =  html.Div(
+content =  html.Div(
     [
         dbc.Row([
             dbc.Col([
@@ -48,52 +46,29 @@ contenido =  html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                html.H5('Accidents per Year'.upper(), className='graph-title'
-                ),
-                dcc.Graph(id="accidents-per-year-graph", className='graph')
-            ], xs=12)
-        ]),
-        dbc.Row([
-            dbc.Col([
-                html.H5('Time Series'.upper(), className='graph-title'
-                ),
-                dcc.Graph(id="time-series", className='graph')
-            ], xs=12)
-        ]),
-        dbc.Row([
-            dbc.Col([
-                html.H5('Geospatial Analysis'.upper(), className='graph-title'
-                ),
-                dcc.Graph(id="map", className='graph')
-            ], xs=12)
-        ]),
-        dbc.Row([
-            dbc.Col([
-                html.H5('Heatmap Analysis'.upper(), className='graph-title'
-                ),
+                html.H5('Heatmap Analysis'.upper(), className='graph-title'),
                 dbc.Row([
                     dbc.Col([
                          dcc.Graph(id="heat-map-month"),
-                    ], xs=6),
+                    ], xl=6, lg=12),
                     dbc.Col([
                          dcc.Graph(id="heat-map-hour")
-                    ], xs=6)
-                ], className='graph')
-            ], xs=12)
-        ])
+                    ], xl=6, lg=12)
+                ], className='graph'),
+                html.H5('Accidents per Year'.upper(), className='graph-title'),
+                dcc.Graph(id="accidents-per-year-graph", className='graph')
+            ], xl=6, lg=12),
+            dbc.Col([
+                html.H5('Time Series'.upper(), className='graph-title'),
+                dcc.Graph(id="time-series", className='graph'),
+                html.H5('Geospatial Analysis'.upper(), className='graph-title'),
+                dcc.Graph(id="map", className='graph')
+            ], xl=6, lg=12)
+            
+        ]),
     ],
-    className="Alejandro"
+    className='content'
 ) 
-
-# SIDEBAR_STYLE = {
-#     # "position": "fixed",
-#     "top": 0,
-#     "left": 0,
-#     "bottom": 0,
-#     "width": "16rem",
-#     "padding": "2rem 1rem",
-#     "background-color": "#f8f9fa",
-# }
 
 chkclass={
    'display': 'block',
@@ -120,7 +95,7 @@ check_month = dcc.Dropdown(
 checklist_borough = html.Div(
     [
         dbc.Checklist(
-            options=[ {"label": borough, "value": borough}  for borough in boroughs],
+            options=[ {"label": borough.title(), "value": borough}  for borough in boroughs],
             value=[],
             id="borough",
             
@@ -131,7 +106,7 @@ checklist_borough = html.Div(
 check_accidents_type = html.Div(
     [
         dbc.Checklist(
-            options=[ {"label": accident_type, "value": accident_type}  for accident_type in accident_types],
+            options=[ {"label": accident_type.title(), "value": accident_type}  for accident_type in accident_types],
             value=[],
             id="accident-type",
         ),
@@ -163,18 +138,14 @@ sidebar = html.Div(
         check_accidents_type,
         
     ],
-    # style=SIDEBAR_STYLE,
+    className= 'sidebar'
 )
 
 
 layout = dbc.Container(
     [
-        dbc.Row(
-            [
-                dbc.Col(sidebar, md=2),
-                dbc.Col(contenido, md=10)
-            ]
-        )
+        sidebar,
+        content
     ]
 
 )

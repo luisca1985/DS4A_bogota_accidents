@@ -42,6 +42,7 @@ navbar = dbc.Navbar(
             ),
         ]
     ),
+    fixed='top',
     color="#FAC63F",
     dark=False,
     className="mb-2",

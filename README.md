@@ -102,10 +102,27 @@ virtualenv .venv
 ```
 .venv/Scripts/activate
 ```
-Should you have any problem, execute:
-```
-Set-ExecutionPolicy Unrestricted -Scope Process
-```
+##### Likely problems
+
+1. Execution Policy problem, execute:
+    ```
+    Set-ExecutionPolicy Unrestricted -Scope Process
+    ```
+
+2. Fiona installation problem, download GDAL from
+[download GDAL](https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal)
+and then execute
+    ```
+    pip install c:\Users\........\GDAL‑3.0.4‑cp37‑cp37m‑win32.whl
+    ```
+    Finally, download Fiona from
+    [download Fiona](https://www.lfd.uci.edu/~gohlke/pythonlibs/#fiona)
+    and then execute
+    ```
+    pip install c:\Users\........\Fiona‑1.8.13‑cp37‑cp37m‑win32.whl
+    ```
+
+
 
 #### Install packages
 

@@ -61,6 +61,13 @@ def get_data_cleaned():
     df["day_of_week"] = df["full_date"].dt.day_name()
     df["hour"] = df["full_date"].dt.hour
     df["month_year"] = df["month"].astype(str).str[:3] + ", " + df["year"].astype(str)
+    ## MM/YYYY
+    df['Count'] = 1
+    df['MM_YYYY'] = df['full_date'].dt.to_period('M').dt.strftime('%b/%Y')
+    # Month, week and day number of the year
+    df['month_number'] = df['full_date'].dt.month
+    df['week_number'] = df['full_date'].dt.isocalendar().week
+    df['day_number']= df['full_date'].dt.dayofyear
 
     # Loading the shape file for Bogotá polygons of boroughs
     shp_df = gpd.read_file('data/localidades/localidades.shp')

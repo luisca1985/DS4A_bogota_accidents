@@ -71,7 +71,7 @@ content = html.Div(
         dbc.Row([
             dbc.Col([
                 html.H5('Accidents per Year'.upper(), className='graph-title'),
-                dcc.Graph(id="accidents-per-year-graph", className='graph')
+                dcc.Graph(id="bar-month-year", className='graph')
             ], xl=6, lg=12),
             dbc.Col([
                 html.H5('Geospatial Analysis'.upper(),
@@ -86,7 +86,8 @@ content = html.Div(
                 dcc.Graph(id="cat-severity", className='graph')
             ], xl=3, lg=12),
             dbc.Col([
-                html.H5('Accident Type Analysis'.upper(), className='graph-title'),
+                html.H5('Accident Type Analysis'.upper(),
+                        className='graph-title'),
                 dcc.Graph(id="cat-accident-type", className='graph')
             ], xl=3, lg=12),
             dbc.Col([
@@ -128,8 +129,8 @@ content = html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                html.H5('Time Series'.upper(), className='graph-title'),
-                dcc.Graph(id="time-series", className='graph')
+                html.H5('Time Series Year Accident Type'.upper(), className='graph-title'),
+                dcc.Graph(id="time-series-year-type", className='graph')
             ], xl=6, lg=12),
             dbc.Col([
 
@@ -228,6 +229,21 @@ layout = dbc.Container(
     Output("max-type-accident", "children"),
     Output("max-date", "children"),
     Output("max-day", "children"),
+    Output("heat-map-month", "figure"),
+    Output("heat-map-hour", "figure"),
+    Output("time-series-mm-yyyy", "figure"),
+    Output("bar-month-year", "figure"),
+    Output("map", "figure"),
+    Output("cat-severity", "figure"),
+    Output("cat-accident-type", "figure"),
+    Output("cat-borough", "figure"),
+    Output("stack-time-series-month", "figure"),
+    Output("stack-time-series-week", "figure"),
+    Output("stack-time-series-day", "figure"),
+    Output("time-series-month", "figure"),
+    Output("time-series-week", "figure"),
+    Output("time-series-day", "figure"),
+    Output("time-series-year-type", "figure"),
     Input("borough", "value"),
     Input("accident-type", "value"),
     Input("year", "value"),
@@ -239,6 +255,7 @@ def kpis(borough, accident_type, year, month):
     df2 = df2[df2['year'].isin(year)] if year else df2
     df2 = df2[df2['month'].isin(month)] if month else df2
 
+    # KPIs
     max_borough = df2["borough"].value_counts().reset_index()["index"][0]
     max_type_accident = df2["accident_type"].value_counts().reset_index()[
         "index"][0].upper()
@@ -247,63 +264,20 @@ def kpis(borough, accident_type, year, month):
     max_day = df2["day_of_week"].value_counts().reset_index()[
         "index"][0].upper()
 
-    return max_borough, max_type_accident, max_date, max_day
-
-
-@callback(
-    Output("heat-map-month", "figure"),
-    Output("heat-map-hour", "figure"),
-    Input("borough", "value"),
-    Input("accident-type", "value"),
-    Input("year", "value"),
-    Input("month", "value"))
-def heat_map(borough, accident_type, year, month):
-    df2 = df[df['borough'].isin(borough)] if borough else df
-    df2 = df2[df2['accident_type'].isin(
-        accident_type)] if accident_type else df2
-    df2 = df2[df2['year'].isin(year)] if year else df2
-    df2 = df2[df2['month'].isin(month)] if month else df2
-
-    dow = ['Monday', 'Tuesday', 'Wednesday',
-           'Thursday', 'Friday', 'Saturday', 'Sunday']
-    df2['day_of_week'] = pd.Categorical(
-        df2['day_of_week'], categories=dow, ordered=True)
-    contingency_table = pd.crosstab(
+    # Heatmaps
+    contingency_table_heatmap_month = pd.crosstab(
         index=df2['month'], columns=df2['day_of_week'], normalize="index")*100
-    fig_month = px.imshow(contingency_table)
+    fig_heatmap_month = px.imshow(contingency_table_heatmap_month)
+    fig_heatmap_month.update_layout(
+        yaxis_title="Month", xaxis_title="Day of Week")
 
-    fig_month.update_layout(
-        yaxis_title="Month",
-        xaxis_title="Day of Week"
-
-    )
-
-    contingency_table2 = pd.crosstab(
+    contingency_table_heatmap_hour = pd.crosstab(
         index=df2['hour'], columns=df2['day_of_week'], normalize="columns")*100
-    fig_hour = px.imshow(contingency_table2)
+    fig_heatmap_hour = px.imshow(contingency_table_heatmap_hour)
+    fig_heatmap_hour.update_layout(
+        yaxis_title="Hour", xaxis_title="Day of Week")
 
-    fig_hour.update_layout(
-        yaxis_title="Hour",
-        xaxis_title="Day of Week"
-
-    )
-
-    return fig_month, fig_hour
-
-
-@callback(
-    Output("time-series-mm-yyyy", "figure"),
-    Input("borough", "value"),
-    Input("accident-type", "value"),
-    Input("year", "value"),
-    Input("month", "value"))
-def time_series_mm_yyyy(borough, accident_type, year, month):
-    df2 = df[df['borough'].isin(borough)] if borough else df
-    df2 = df2[df2['accident_type'].isin(
-        accident_type)] if accident_type else df2
-    df2 = df2[df2['year'].isin(year)] if year else df2
-    df2 = df2[df2['month'].isin(month)] if month else df2
-
+    # Time series complete (MM/YYYY)
     df_my = df2.groupby(['MM_YYYY'])["Count"].sum()
     df_my = DataFrame(df_my).reset_index()
     df_my["MM_YYYY"] = df_my["MM_YYYY"].astype(str)
@@ -315,10 +289,10 @@ def time_series_mm_yyyy(borough, accident_type, year, month):
     df_my = df_my.sort_values(["YYYY", "MM"])
     df_my
 
-    fig = px.line(df_my, x='MM_YYYY', y='Count')
+    fig_timeseries_mmyyyy = px.line(df_my, x='MM_YYYY', y='Count')
 
-    fig.update_xaxes(tickangle=270)
-    fig.update_layout(
+    fig_timeseries_mmyyyy.update_xaxes(tickangle=270)
+    fig_timeseries_mmyyyy.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Month/Year",
         xaxis=dict(
@@ -326,92 +300,43 @@ def time_series_mm_yyyy(borough, accident_type, year, month):
             tick0=0,
             dtick=3,
             showgrid=False,
-        ),  # yaxis=dict(showgrid=False),
+        ),
     )
 
-    return fig
-
-
-@callback(
-    Output("accidents-per-year-graph", "figure"),
-    Input("borough", "value"),
-    Input("accident-type", "value"),
-    Input("year", "value"),
-    Input("month", "value"))
-def bar_plot(borough, accident_type, year, month):
-    df2 = df[df['borough'].isin(borough)] if borough else df
-    df2 = df2[df2['accident_type'].isin(
-        accident_type)] if accident_type else df2
-    df2 = df2[df2['year'].isin(year)] if year else df2
-    df2 = df2[df2['month'].isin(month)] if month else df2
-    seg = df2.groupby(['year', 'month']).size().to_frame(
+    # Bar plot month year
+    df_year_month = df2.groupby(['year', 'month']).size().to_frame(
         'number_of_accident').reset_index()
-    seg['year'] = seg['year'].astype('category')
+    df_year_month['year'] = df_year_month['year'].astype('category')
 
-    fig = px.bar(seg, x='month', y='number_of_accident', color='year', text_auto=True,
-                 labels={
-                     'month': 'Months',
-                     'number_of_accident': 'Number of Accidents',
-                     'year': 'Years'
-                 })
+    fig_bar_month_year = px.bar(df_year_month, x='month', y='number_of_accident', color='year', text_auto=True,
+                                labels={
+                                    'month': 'Months',
+                                    'number_of_accident': 'Number of Accidents',
+                                    'year': 'Years'
+                                })
 
-    fig.update_layout(
-        titlefont=dict(size=20, color='#FCA91F',
-                       family='Helvetica, sans-serif')
-    )
-
-    return fig
-
-
-@callback(
-    Output("map", "figure"),
-    Input("borough", "value"),
-    Input("accident-type", "value"),
-    Input("year", "value"),
-    Input("month", "value"))
-def map(borough, accident_type, year, month):
-    df2 = df[df['borough'].isin(borough)] if borough else df
-    df2 = df2[df2['accident_type'].isin(
-        accident_type)] if accident_type else df2
-    df2 = df2[df2['year'].isin(year)] if year else df2
-    df2 = df2[df2['month'].isin(month)] if month else df2
-
-    df_borough_total = df2.groupby(['borough']).size().to_frame(
+    # Map
+    df_borough = df2.groupby(['borough']).size().to_frame(
         'num_accidents').reset_index()
-    accidents_total = geo_df.merge(df_borough_total, how="left", left_on=[
-                                   'borough'], right_on=['borough'])
+    df_geo_borough = geo_df.merge(df_borough, how="left", left_on=[
+        'borough'], right_on=['borough'])
 
-    accidents_total.to_crs(pyproj.CRS.from_epsg(4326), inplace=True)
-    fig = px.choropleth(accidents_total, geojson=accidents_total.geometry,
-                        color="num_accidents", locations=accidents_total.index)
-    fig.update_geos(fitbounds="locations")
+    df_geo_borough.to_crs(pyproj.CRS.from_epsg(4326), inplace=True)
+    fig_map = px.choropleth(df_geo_borough, geojson=df_geo_borough.geometry,
+                            color="num_accidents", locations=df_geo_borough.index)
+    fig_map.update_geos(fitbounds="locations")
 
-    fig.update_layout(
-        yaxis_title="Number of Accidents",
-        xaxis_title="Years"
-    )
+    fig_map.update_layout(
+        yaxis_title="Number of Accidents", xaxis_title="Years")
 
-    return fig
-
-@callback(
-    Output("cat-severity", "figure"),
-    Output("cat-accident-type", "figure"),
-    Output("cat-borough", "figure"),
-    Input("borough", "value"),
-    Input("accident-type", "value"),
-    Input("year", "value"),
-    Input("month", "value"))
-def categorical_variables(borough, accident_type, year, month):
-    df2 = df[df['borough'].isin(borough)] if borough else df
-    df2 = df2[df2['accident_type'].isin(
-        accident_type)] if accident_type else df2
-    df2 = df2[df2['year'].isin(year)] if year else df2
-    df2 = df2[df2['month'].isin(month)] if month else df2
+    # Categorical analysis
 
     df_sev = df2.groupby(['severity'])["Count"].sum()
-    df_sev= DataFrame(df_sev).reset_index()
-    df_sev["percentage"] = ((df_sev["Count"] / df_sev["Count"].sum())*100).astype(int).astype(str) + '%'
-    fig_severity = px.bar(df_sev, x=df_sev.severity, y=df_sev.Count, color="severity", text= "percentage")
+    df_sev = DataFrame(df_sev).reset_index()
+    df_sev["percentage"] = (
+        (df_sev["Count"] / df_sev["Count"].sum())*100).astype(int).astype(str) + '%'
+    fig_severity = px.bar(df_sev, x=df_sev.severity,
+                          y=df_sev.Count, color="severity", text="percentage")
 
     fig_severity.update_layout(
         yaxis_title="Accident Percentage",
@@ -419,10 +344,12 @@ def categorical_variables(borough, accident_type, year, month):
     )
 
     df_type = df2.groupby(['accident_type'])["Count"].sum()
-    df_type= DataFrame(df_type).reset_index()
-    df_type = df_type.sort_values("Count", ascending = False)
-    df_type["percentage"] = ((df_type["Count"] / df_type["Count"].sum())*100).astype(int).astype(str) + '%'
-    fig_accident_types = px.bar(df_type, x=df_type.accident_type, y=df_type.Count, color="accident_type", text= "percentage")
+    df_type = DataFrame(df_type).reset_index()
+    df_type = df_type.sort_values("Count", ascending=False)
+    df_type["percentage"] = (
+        (df_type["Count"] / df_type["Count"].sum())*100).astype(int).astype(str) + '%'
+    fig_accident_types = px.bar(df_type, x=df_type.accident_type,
+                                y=df_type.Count, color="accident_type", text="percentage")
 
     fig_accident_types.update_layout(
         yaxis_title="Accident Percentage",
@@ -430,149 +357,104 @@ def categorical_variables(borough, accident_type, year, month):
     )
 
     df_brg = df2.groupby(['borough'])["Count"].sum()
-    df_brg= DataFrame(df_brg).reset_index()
-    df_brg = df_brg.sort_values("Count", ascending = False)
-    df_brg["percentage"] = ((df_brg["Count"] / df_brg["Count"].sum())*100).astype(int).astype(str) + '%'
-    fig_borough = px.bar(df_brg, x=df_brg.borough, y=df_brg.Count, color="borough", text= "percentage")
+    df_brg = DataFrame(df_brg).reset_index()
+    df_brg = df_brg.sort_values("Count", ascending=False)
+    df_brg["percentage"] = (
+        (df_brg["Count"] / df_brg["Count"].sum())*100).astype(int).astype(str) + '%'
+    fig_borough = px.bar(df_brg, x=df_brg.borough,
+                         y=df_brg.Count, color="borough", text="percentage")
 
     fig_borough.update_layout(
         yaxis_title="Accident Percentage",
         xaxis_title="Borough"
     )
-
-    return fig_severity, fig_accident_types, fig_borough
-
-
-@callback(
-    Output("stack-time-series-month", "figure"),
-    Output("stack-time-series-week", "figure"),
-    Output("stack-time-series-day", "figure"),
-    Input("borough", "value"),
-    Input("accident-type", "value"),
-    Input("year", "value"),
-    Input("month", "value"))
-def stack_time_series_year(borough, accident_type, year, month):
-    df2 = df[df['borough'].isin(borough)] if borough else df
-    df2 = df2[df2['accident_type'].isin(
-        accident_type)] if accident_type else df2
-    df2 = df2[df2['year'].isin(year)] if year else df2
-    df2 = df2[df2['month'].isin(month)] if month else df2
-
-    seg = df2.groupby(['year', 'month_number']).size().to_frame(
+    
+    # Stack time series year
+    df_year_monthnum = df2.groupby(['year', 'month_number']).size().to_frame(
         'Number_of_Monthly_Accidents').reset_index()
-    fig_month = px.area(seg, x="month_number",
+    fig_area_month_year = px.area(df_year_monthnum, x="month_number",
                         y="Number_of_Monthly_Accidents", color="year", line_group="year")
+    fig_area_month_year.update_layout(
+        yaxis_title="Number of Accidents",
+        xaxis_title="Month of Year"
+    )
+    
+    df_year_weeknum = df2.groupby(['year', 'week_number']).size().to_frame(
+        'Number_of_Weekly_Accidents').reset_index()
+    fig_area_week_year = px.area(df_year_weeknum, x="week_number",
+                       y="Number_of_Weekly_Accidents", color="year", line_group="year")
+    fig_area_week_year.update_layout(
+        yaxis_title="Number of Accidents",
+        xaxis_title="Week of Year"
+    )
 
-    fig_month.update_layout(
+    df_year_daynum = df2.groupby(['year', 'day_number']).size().to_frame(
+        'Number_of_Daily_Accidents').reset_index()
+    fig_area_day_year = px.area(df_year_daynum, x="day_number",
+                      y="Number_of_Daily_Accidents", color="year", line_group="year")
+    fig_area_day_year.update_layout(
+        yaxis_title="Number of Accidents",
+        xaxis_title="Day of Year"
+    )
+
+    # Time series year
+    fig_line_month_year = px.line(df_year_monthnum, x="month_number",
+                        y="Number_of_Monthly_Accidents", color="year", line_group="year")
+    fig_line_month_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Month of Year"
 
     )
 
-    seg2 = df2.groupby(['year', 'week_number']).size().to_frame(
-        'Number_of_Weekly_Accidents').reset_index()
-    fig_week = px.area(seg2, x="week_number",
+    fig_line_week_year = px.line(df_year_weeknum, x="week_number",
                        y="Number_of_Weekly_Accidents", color="year", line_group="year")
-
-    fig_week.update_layout(
+    fig_line_week_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Week of Year"
     )
 
-    seg3 = df2.groupby(['year', 'day_number']).size().to_frame(
-        'Number_of_Daily_Accidents').reset_index()
-    fig_day = px.area(seg3, x="day_number",
+    fig_line_day_year = px.line(df_year_daynum, x="day_number",
                       y="Number_of_Daily_Accidents", color="year", line_group="year")
-
-    fig_day.update_layout(
+    fig_line_day_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Day of Year"
     )
 
-    return fig_month, fig_week, fig_day
+    # Time series year accident type
+    df_year_accidenttype = df2.groupby(["year", "accident_type"])["Count"].sum()
+    df_year_accidenttype = df_year_accidenttype.reset_index()
 
-
-@callback(
-    Output("time-series-month", "figure"),
-    Output("time-series-week", "figure"),
-    Output("time-series-day", "figure"),
-    Input("borough", "value"),
-    Input("accident-type", "value"),
-    Input("year", "value"),
-    Input("month", "value"))
-def time_series_year(borough, accident_type, year, month):
-    df2 = df[df['borough'].isin(borough)] if borough else df
-    df2 = df2[df2['accident_type'].isin(
-        accident_type)] if accident_type else df2
-    df2 = df2[df2['year'].isin(year)] if year else df2
-    df2 = df2[df2['month'].isin(month)] if month else df2
-
-    seg = df2.groupby(['year', 'month_number']).size().to_frame(
-        'Number_of_Monthly_Accidents').reset_index()
-    fig_month = px.line(seg, x="month_number",
-                        y="Number_of_Monthly_Accidents", color="year", line_group="year")
-
-    fig_month.update_layout(
-        yaxis_title="Number of Accidents",
-        xaxis_title="Month of Year"
-
-    )
-
-    seg2 = df2.groupby(['year', 'week_number']).size().to_frame(
-        'Number_of_Weekly_Accidents').reset_index()
-    fig_week = px.line(seg2, x="week_number",
-                       y="Number_of_Weekly_Accidents", color="year", line_group="year")
-
-    fig_week.update_layout(
-        yaxis_title="Number of Accidents",
-        xaxis_title="Week of Year"
-
-    )
-
-    seg3 = df2.groupby(['year', 'day_number']).size().to_frame(
-        'Number_of_Daily_Accidents').reset_index()
-    fig_day = px.line(seg3, x="day_number",
-                      y="Number_of_Daily_Accidents", color="year", line_group="year")
-
-    fig_day.update_layout(
-        yaxis_title="Number of Accidents",
-        xaxis_title="Day of Year"
-    )
-
-    return fig_month, fig_week, fig_day
-
-
-@callback(
-    Output("time-series", "figure"),
-    Input("borough", "value"),
-    Input("accident-type", "value"),
-    Input("year", "value"),
-    Input("month", "value"))
-def time_series(borough, accident_type, year, month):
-    df2 = df[df['borough'].isin(borough)] if borough else df
-    df2 = df2[df2['accident_type'].isin(
-        accident_type)] if accident_type else df2
-    df2 = df2[df2['year'].isin(year)] if year else df2
-    df2 = df2[df2['month'].isin(month)] if month else df2
-
-    df2['id_ones'] = 1
-
-    df3 = df2.groupby(["year", "accident_type"])["id_ones"].sum()
-    df3 = df3.reset_index()
-
-    fig = go.Figure()
+    fig_lines_year_acctypes = go.Figure()
     accident_type_list = list(df2['accident_type'].unique())
     for accident_type in accident_type_list:
-        fig.add_trace(
+        fig_lines_year_acctypes.add_trace(
             go.Scatter(
-                x=df3['year'][df3['accident_type'] == accident_type],
-                y=df3['id_ones'][df3['accident_type'] == accident_type],
+                x=df_year_accidenttype['year'][df_year_accidenttype['accident_type'] == accident_type],
+                y=df_year_accidenttype['Count'][df_year_accidenttype['accident_type'] == accident_type],
                 name=accident_type)
         )
-
-    fig.update_layout(
+    fig_lines_year_acctypes.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Years"
     )
 
-    return fig
+    return (
+        max_borough,
+        max_type_accident,
+        max_date,
+        max_day,
+        fig_heatmap_month,
+        fig_heatmap_hour,
+        fig_timeseries_mmyyyy,
+        fig_bar_month_year,
+        fig_map,
+        fig_severity,
+        fig_accident_types,
+        fig_borough,
+        fig_area_month_year, 
+        fig_area_week_year, 
+        fig_area_day_year,
+        fig_line_month_year,
+        fig_line_week_year,
+        fig_line_day_year,
+        fig_lines_year_acctypes)

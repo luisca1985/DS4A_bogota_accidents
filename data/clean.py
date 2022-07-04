@@ -59,6 +59,8 @@ def get_data_cleaned():
     mon = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     df['month']= pd.Categorical(df['month'], categories=mon, ordered=True)
     df["day_of_week"] = df["full_date"].dt.day_name()
+    dow = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    df['day_of_week'] = pd.Categorical(df['day_of_week'], categories=dow, ordered=True)
     df["hour"] = df["full_date"].dt.hour
     df["month_year"] = df["month"].astype(str).str[:3] + ", " + df["year"].astype(str)
     ## MM/YYYY

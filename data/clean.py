@@ -54,6 +54,7 @@ def get_data_cleaned():
     
     # Data Augmentation
     #We extract the year, month, day name, and hour from the "date" column and store them in separate columns
+    df['date'] = df['full_date'].dt.date
     df["year"] = df["full_date"].dt.year
     df["month"] = df["full_date"].dt.month_name()
     mon = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']

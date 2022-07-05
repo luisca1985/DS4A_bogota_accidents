@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 import pyproj
 from datetime import datetime, date
 from time import sleep
+import folium as fl
+from folium.plugins import HeatMap
 
 
 register_page(__name__, path="/")
@@ -29,8 +31,14 @@ mapa_ejemplo = mapsample('Mapa de ejemplo', 'id_mapa_ejemplo')
 df, geo_df = get_data_cleaned()
 boroughs = sorted(df['borough'].unique())
 accident_types = sorted(df['accident_type'].unique())
-print(f'type month: { df["month"].dtype }')
 months = df['month'].cat.categories
+
+# Map Folium
+latlon = df[['latitude','longitude']].values;
+data_map = latlon.tolist();
+m = fl.Map(location=[4.667938335150177, -74.09627263210282], zoom_start=11.5, tiles='Stamen Terrain')
+HeatMap(data_map, radius=1).add_to(m)
+m.save('assets/map.html')
 
 content = html.Div(
     [
@@ -49,6 +57,19 @@ content = html.Div(
             dbc.Col([
                 kpi4.display()
             ], className='card kpi', xl=3, lg=6, xs=12)
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.H5('Map'.upper(), className='graph-title'),
+                dbc.Row([
+                    dbc.Col([
+                        html.H6('Heatmap intensity:', style={"color": "black"}),
+                        dcc.Slider(1,20,1, value = 15, id='input-radius-heatmap'),
+                        html.Iframe(id='map-folium', src='assets/map.html', style={"height": "495px", "width": "100%"})
+                    ]
+                    )
+                ], className='graph')
+            ], lg=12)
         ]),
         dbc.Row([
             dbc.Col([
@@ -145,6 +166,9 @@ content = html.Div(
                 dcc.Graph(id="time-series-year-type", className='graph')
             ], xl=6, lg=12),
             dbc.Col([
+                html.H5('Histogram'.upper(),
+                        className='graph-title'),
+                dcc.Graph(id="histogram", className='graph')
 
             ], xl=6, lg=12)
 
@@ -258,11 +282,14 @@ layout = dbc.Container(
     Output("time-series-week", "figure"),
     Output("time-series-day", "figure"),
     Output("time-series-year-type", "figure"),
+    Output("histogram", "figure"),
+    Output("map-folium", "srcDoc"),
     Input("borough", "value"),
     Input("accident-type", "value"),
     Input("year", "value"),
-    Input("month", "value"))
-def kpis(borough, accident_type, year, month):
+    Input("month", "value"),
+    Input('input-radius-heatmap', 'value'))
+def kpis(borough, accident_type, year, month, radius_heatmap):
     df2 = df[df['borough'].isin(borough)] if borough else df
     df2 = df2[df2['accident_type'].isin(
         accident_type)] if accident_type else df2
@@ -343,7 +370,11 @@ def kpis(borough, accident_type, year, month):
     fig_map.update_geos(fitbounds="locations")
 
     fig_map.update_layout(
-        yaxis_title="Number of Accidents", xaxis_title="Years")
+        # margin=dict(l=20, r=20, t=20, b=100),
+        yaxis_title="Number of Accidents", 
+        xaxis_title="Years"
+        )
+    # fig_map.update_yaxes(automargin=True)
 
     # Categorical analysis
 
@@ -480,6 +511,25 @@ def kpis(borough, accident_type, year, month):
         xaxis_title="Years"
     )
 
+    # Histogram
+    count_by_date = df2[["date"]].value_counts()
+    fig_histogram = px.histogram(count_by_date, nbins=20)
+    fig_histogram.update_layout(
+        yaxis_title="Frequency",
+        xaxis_title="Number of Accidents per Day",
+        showlegend=False
+    )
+
+    # Heatmap
+    latlon = df2[['latitude','longitude']].values;
+    data_map = latlon.tolist();
+    m = fl.Map(location=[4.667938335150177, -74.09627263210282], zoom_start=11.5, tiles='Stamen Terrain')
+    HeatMap(data_map, radius=radius_heatmap).add_to(m)
+    html_map_name = 'map.html'
+    html_map_src = f"assets/{html_map_name}"
+    m.save(html_map_src)
+    html_map = open(html_map_src, 'r').read()
+
     return (
         max_borough,
         max_type_accident,
@@ -501,4 +551,7 @@ def kpis(borough, accident_type, year, month):
         fig_line_month_year,
         fig_line_week_year,
         fig_line_day_year,
-        fig_lines_year_acctypes)
+        fig_lines_year_acctypes,
+        fig_histogram,
+        html_map,
+        )

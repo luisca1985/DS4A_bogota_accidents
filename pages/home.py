@@ -83,16 +83,27 @@ content = html.Div(
         dbc.Row([
             dbc.Col([
                 html.H5('Severity Analysis'.upper(), className='graph-title'),
-                dcc.Graph(id="cat-severity", className='graph')
+                dcc.Graph(id="bar-severity", className='graph')
             ], xl=3, lg=12),
             dbc.Col([
                 html.H5('Accident Type Analysis'.upper(),
                         className='graph-title'),
-                dcc.Graph(id="cat-accident-type", className='graph')
+                dcc.Graph(id="bar-accident-type", className='graph')
             ], xl=3, lg=12),
             dbc.Col([
                 html.H5('Borough Analysis'.upper(), className='graph-title'),
-                dcc.Graph(id="cat-borough", className='graph')
+                dcc.Graph(id="bar-borough", className='graph')
+
+            ], xl=6, lg=12)
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.H5('Year Analysis'.upper(), className='graph-title'),
+                dcc.Graph(id="bar-year", className='graph')
+            ], xl=6, lg=12),
+            dbc.Col([
+                html.H5('Hour Analysis'.upper(), className='graph-title'),
+                dcc.Graph(id="bar-hour", className='graph')
 
             ], xl=6, lg=12)
         ]),
@@ -129,7 +140,8 @@ content = html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                html.H5('Time Series Year Accident Type'.upper(), className='graph-title'),
+                html.H5('Time Series Year Accident Type'.upper(),
+                        className='graph-title'),
                 dcc.Graph(id="time-series-year-type", className='graph')
             ], xl=6, lg=12),
             dbc.Col([
@@ -234,9 +246,11 @@ layout = dbc.Container(
     Output("time-series-mm-yyyy", "figure"),
     Output("bar-month-year", "figure"),
     Output("map", "figure"),
-    Output("cat-severity", "figure"),
-    Output("cat-accident-type", "figure"),
-    Output("cat-borough", "figure"),
+    Output("bar-severity", "figure"),
+    Output("bar-accident-type", "figure"),
+    Output("bar-borough", "figure"),
+    Output("bar-year", "figure"),
+    Output("bar-hour", "figure"),
     Output("stack-time-series-month", "figure"),
     Output("stack-time-series-week", "figure"),
     Output("stack-time-series-day", "figure"),
@@ -254,6 +268,8 @@ def kpis(borough, accident_type, year, month):
         accident_type)] if accident_type else df2
     df2 = df2[df2['year'].isin(year)] if year else df2
     df2 = df2[df2['month'].isin(month)] if month else df2
+
+    print(df2.columns)
 
     # KPIs
     max_borough = df2["borough"].value_counts().reset_index()["index"][0]
@@ -339,7 +355,7 @@ def kpis(borough, accident_type, year, month):
                           y=df_sev.Count, color="severity", text="percentage")
 
     fig_severity.update_layout(
-        yaxis_title="Accident Percentage",
+        yaxis_title="Number of Accidents",
         xaxis_title="Severity"
     )
 
@@ -352,7 +368,7 @@ def kpis(borough, accident_type, year, month):
                                 y=df_type.Count, color="accident_type", text="percentage")
 
     fig_accident_types.update_layout(
-        yaxis_title="Accident Percentage",
+        yaxis_title="Number of Accidents",
         xaxis_title="Accident Types"
     )
 
@@ -365,24 +381,47 @@ def kpis(borough, accident_type, year, month):
                          y=df_brg.Count, color="borough", text="percentage")
 
     fig_borough.update_layout(
-        yaxis_title="Accident Percentage",
+        yaxis_title="Number of Accidents",
         xaxis_title="Borough"
     )
-    
+
+    # Bar plot Time analysis
+    df_years = df2.groupby(['year'])["Count"].sum()
+    df_years = DataFrame(df_years).reset_index()
+    df_years = df_years.sort_values("Count", ascending=False)
+    df_years["percentage"] = (
+        (df_years["Count"] / df_years["Count"].sum())*100).astype(int).astype(str) + '%'
+    fig_bar_years = px.bar(df_years, x=df_years.year, y=df_years.Count, title="Accidents by year",  color="year", text= "percentage")
+    fig_bar_years.update_coloraxes(showscale = False)
+    fig_bar_years.update_layout(
+        yaxis_title="ANumber of Accidents",
+        xaxis_title="Year"
+    )
+
+    df_hour = df.groupby(['hour'])["Count"].sum()
+    df_hour= DataFrame(df_hour).reset_index()
+    df_hour = df_hour.sort_values("hour", ascending = True)
+    fig_bar_hours= px.bar(df_hour, x=df_hour.hour, y=df_hour.Count, color="hour", title="Accidents by hour")
+    fig_bar_hours.update_coloraxes(showscale = False)
+    fig_bar_hours.update_layout(
+        yaxis_title="Number of Accidents",
+        xaxis_title="Year"
+    )
+
     # Stack time series year
     df_year_monthnum = df2.groupby(['year', 'month_number']).size().to_frame(
         'Number_of_Monthly_Accidents').reset_index()
     fig_area_month_year = px.area(df_year_monthnum, x="month_number",
-                        y="Number_of_Monthly_Accidents", color="year", line_group="year")
+                                  y="Number_of_Monthly_Accidents", color="year", line_group="year")
     fig_area_month_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Month of Year"
     )
-    
+
     df_year_weeknum = df2.groupby(['year', 'week_number']).size().to_frame(
         'Number_of_Weekly_Accidents').reset_index()
     fig_area_week_year = px.area(df_year_weeknum, x="week_number",
-                       y="Number_of_Weekly_Accidents", color="year", line_group="year")
+                                 y="Number_of_Weekly_Accidents", color="year", line_group="year")
     fig_area_week_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Week of Year"
@@ -391,7 +430,7 @@ def kpis(borough, accident_type, year, month):
     df_year_daynum = df2.groupby(['year', 'day_number']).size().to_frame(
         'Number_of_Daily_Accidents').reset_index()
     fig_area_day_year = px.area(df_year_daynum, x="day_number",
-                      y="Number_of_Daily_Accidents", color="year", line_group="year")
+                                y="Number_of_Daily_Accidents", color="year", line_group="year")
     fig_area_day_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Day of Year"
@@ -399,7 +438,7 @@ def kpis(borough, accident_type, year, month):
 
     # Time series year
     fig_line_month_year = px.line(df_year_monthnum, x="month_number",
-                        y="Number_of_Monthly_Accidents", color="year", line_group="year")
+                                  y="Number_of_Monthly_Accidents", color="year", line_group="year")
     fig_line_month_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Month of Year"
@@ -407,21 +446,22 @@ def kpis(borough, accident_type, year, month):
     )
 
     fig_line_week_year = px.line(df_year_weeknum, x="week_number",
-                       y="Number_of_Weekly_Accidents", color="year", line_group="year")
+                                 y="Number_of_Weekly_Accidents", color="year", line_group="year")
     fig_line_week_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Week of Year"
     )
 
     fig_line_day_year = px.line(df_year_daynum, x="day_number",
-                      y="Number_of_Daily_Accidents", color="year", line_group="year")
+                                y="Number_of_Daily_Accidents", color="year", line_group="year")
     fig_line_day_year.update_layout(
         yaxis_title="Number of Accidents",
         xaxis_title="Day of Year"
     )
 
     # Time series year accident type
-    df_year_accidenttype = df2.groupby(["year", "accident_type"])["Count"].sum()
+    df_year_accidenttype = df2.groupby(
+        ["year", "accident_type"])["Count"].sum()
     df_year_accidenttype = df_year_accidenttype.reset_index()
 
     fig_lines_year_acctypes = go.Figure()
@@ -429,8 +469,10 @@ def kpis(borough, accident_type, year, month):
     for accident_type in accident_type_list:
         fig_lines_year_acctypes.add_trace(
             go.Scatter(
-                x=df_year_accidenttype['year'][df_year_accidenttype['accident_type'] == accident_type],
-                y=df_year_accidenttype['Count'][df_year_accidenttype['accident_type'] == accident_type],
+                x=df_year_accidenttype['year'][df_year_accidenttype['accident_type']
+                                               == accident_type],
+                y=df_year_accidenttype['Count'][df_year_accidenttype['accident_type']
+                                                == accident_type],
                 name=accident_type)
         )
     fig_lines_year_acctypes.update_layout(
@@ -451,8 +493,10 @@ def kpis(borough, accident_type, year, month):
         fig_severity,
         fig_accident_types,
         fig_borough,
-        fig_area_month_year, 
-        fig_area_week_year, 
+        fig_bar_years,
+        fig_bar_hours,
+        fig_area_month_year,
+        fig_area_week_year,
         fig_area_day_year,
         fig_line_month_year,
         fig_line_week_year,

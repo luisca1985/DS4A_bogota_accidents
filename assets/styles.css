@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+@import url('https://use.fontawesome.com/releases/v5.7.1/css/all.css');
+
 .card {
     border-width: 0.4rem; 
     border-color: #424242;
@@ -33,6 +36,14 @@
     width: calc(100% - 16rem);
     background-color: #424242;
 }
+
+.content_2{
+	padding: 4rem 2rem 2rem 7rem;
+	position:absolute;
+	left: 0rem;
+	width: calc(100%);
+	background-color: #424242;
+ }
 
 .sidebar{
     position: fixed;
@@ -93,3 +104,205 @@ body #_pages_plugin_content {
 .dropboxes{
     color: #424242 !important;
 }
+
+
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	/*font-family: 'Montserrat', sans-serif;*/
+}
+/* 
+body {
+	font-family: Arial, sans-serif;
+	color: black;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+} */
+
+.profile shadow {
+	position: relative;
+}
+.profile {
+	display: flex;
+	flex-direction:column;
+	width: 300px;
+	height: 300px;
+	justify-content: center;
+	align-items: center;
+	
+	border-radius: 30px;
+	position:relative;
+	overflow: hidden;}
+.shadow {
+	-webkit-box-shadow: 0px 3px 8px 0px rgba(0,0,0,0.3);
+	-moz-box-shadow: 0px 3px 8px 0px rgba(0,0,0,0.3);
+	box-shadow: 0px 3px 8px 0px rgba(0,0,0,0.3);
+}
+
+.photo_profile1{
+	background: url('../assets/ladymilenanieves.png');
+	background-size:cover;
+}
+
+.photo_profile2{
+	background: url('../assets/paolamatheus.png');
+	background-size:cover;
+}
+
+.photo_profile3{
+	background: url('../assets/andresfelipeperez.png');
+	background-size:cover;
+}
+
+.photo_profile4{
+	background: url('../assets/juanpablolancheros.png');
+	background-size:cover;
+}
+
+.photo_profile5{
+	background: url('../assets/luiscamilojimenez.png');
+	background-size:cover;
+}
+
+.photo_profile6{
+	background: url('../assets/alejandromorenofresneda.png');
+	background-size:cover;
+}
+
+.photo_profile7{
+	background: url('../assets/andresfelipeguzman.png');
+	background-size:cover;
+}
+
+.photo_profile8{
+	background: url('../assets/josearmandodelgado.png');
+	background-size:cover;
+}
+
+#modal {
+	display: none;
+}
+
+
+.profile > p{
+	display: block;
+	font-size:14px;
+	color: #fff;
+	padding: 20px;
+	opacity: 0;
+	z-index: 999;
+	transition: 0.2s all cubic-bezier(.7,0,.3,1);
+	line-height: 1.5;
+}
+
+.fas{
+	margin: 0 5px 0 0;
+}
+
+#modal:checked ~ p{
+	opacity: 1;
+	transition: 0.2s all cubic-bezier(.7,0,.3,1) 0.2s;
+}
+#modal:checked + .circle {
+	color: rgba(66,66,66,1);
+	width: 1500px;
+	height: 1500px;
+	background: rgba(235,159,33,.75);
+	transition: 0.4s all cubic-bezier(.7,0,.3,1);
+	bottom:-720px;
+	right:-720px;
+}
+
+#modal:checked ~ .circle > .rotatePlus {
+	transform: rotate(945deg);
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+
+.name {
+    cursor: pointer;
+    position: absolute;
+    bottom:0;
+    float:bottom;
+}
+
+.profile:hover~ p{
+	opacity: 1;
+	transition: 0.2s all cubic-bezier(.7,0,.3,1) 0.2s;
+}
+
+.profile .foreground{
+	right:500px;
+	bottom:500px;
+
+	background-color:rgba(235,159,33,.75);
+	transition: 0.4s all cubic-bezier(.7,0,.3,1);
+	width: 40px;
+	height: 40px;
+	padding: 1px 0 0 1px;
+	border-radius: 10000px;
+	position: absolute
+   }
+   
+.profile:hover .foreground ~ p{
+	opacity: 1;
+	transition: 0.2s all cubic-bezier(.7,0,.3,1) 0.2s;
+}
+
+.profile:hover .foreground{
+	color: rgba(66,66,66,1);
+	width: 1500px;
+	height: 1500px;
+	background: rgba(235,159,33,.75);
+	transition: 0.4s all cubic-bezier(.7,0,.3,1);
+	bottom:-720px;
+	right:-720px;
+}
+
+.name {
+	display: flex;
+	flex-direction:column;
+	width: 300px;
+	height: 70px;
+	justify-content: center;
+	align-items: center;
+	position:relative;
+	overflow: hidden;
+}
+
+.profileText > a {
+	text-decoration: none;
+	color: #FAC63F;
+}
+
+.profileText{
+	text-align: center;
+	font-size:15px;
+	text-shadow: #131313;
+	
+}
+
+.ourteamTitle{
+	text-align: center;
+	color: #FCA91F;
+	text-shadow: #131313;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size:40px;
+	width: 100%;
+	height: 120px;
+	padding: 30px;
+	display: flex;
+	flex-direction:column;
+	justify-content: center;
+	align-items: center;
+	position:relative;
+	overflow: hidden;
+
+}
+

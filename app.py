@@ -29,8 +29,8 @@ navbar = dbc.Navbar(
                 href="https://plotly.com",
                 style={"textDecoration": "none", "color":"#424242"},
             ),
-            dbc.NavItem(dbc.NavLink( "Inicio", href='/'),className="g-0 ms-auto flex-nowrap mt-3 mt-md-0 d-none d-lg-block d-xl-block"),
-            dbc.NavItem(dbc.NavLink("Nosotros", href="/nosotros"), class_name='d-none d-lg-block d-xl-block'),
+            dbc.NavItem(dbc.NavLink( "Home", href='/'),className="g-0 ms-auto flex-nowrap mt-3 mt-md-0 d-none d-lg-block d-xl-block"),
+            dbc.NavItem(dbc.NavLink("Our team", href="/ourteam"), class_name='d-none d-lg-block d-xl-block'),
             # dbc.DropdownMenu(
             #     [
                     

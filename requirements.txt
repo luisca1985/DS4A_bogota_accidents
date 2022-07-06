@@ -9,3 +9,5 @@ dash-labs==1.1.0
 geopandas==0.11.0
 matplotlib==3.5.2
 folium
+notebook
+seaborn

@@ -124,6 +124,10 @@ body {
 	align-items: center;
 } */
 
+body{
+	background-color: #424242;
+}
+
 .profile shadow {
 	position: relative;
 }

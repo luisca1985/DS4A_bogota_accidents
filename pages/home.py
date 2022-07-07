@@ -102,32 +102,14 @@ content = html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                html.H5('Heatmap Analysis'.upper(), className='graph-title'),
-                dbc.Row([
-                    dbc.Col([
-                        dcc.Graph(id="heat-map-month"),
-                    ], xl=6, lg=12),
-                    dbc.Col([
-                        dcc.Graph(id="heat-map-hour")
-                    ], xl=6, lg=12)
-                ], className='graph')
+                html.H5('Year Analysis'.upper(), className='graph-title'),
+                dcc.Graph(id="bar-year", className='graph')
             ], xl=6, lg=12),
             dbc.Col([
                 html.H5('Time Series'.upper(), className='graph-title'),
                 dcc.Graph(id="time-series-mm-yyyy", className='graph')
             ], xl=6, lg=12)
 
-        ]),
-        dbc.Row([
-            dbc.Col([
-                html.H5('Year Analysis'.upper(), className='graph-title'),
-                dcc.Graph(id="bar-year", className='graph')
-            ], xl=6, lg=12),
-            dbc.Col([
-                html.H5('Hour Analysis'.upper(), className='graph-title'),
-                dcc.Graph(id="bar-hour", className='graph')
-
-            ], xl=6, lg=12)
         ]),
         dbc.Row([
             dbc.Col([
@@ -172,6 +154,24 @@ content = html.Div(
 
             ], xl=6, lg=12)
 
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.H5('Heatmap Analysis'.upper(), className='graph-title'),
+                dbc.Row([
+                    dbc.Col([
+                        dcc.Graph(id="heat-map-month"),
+                    ], xl=6, lg=12),
+                    dbc.Col([
+                        dcc.Graph(id="heat-map-hour")
+                    ], xl=6, lg=12)
+                ], className='graph')
+            ], xl=6, lg=12),
+            dbc.Col([
+                html.H5('Hour Analysis'.upper(), className='graph-title'),
+                dcc.Graph(id="bar-hour", className='graph')
+
+            ], xl=6, lg=12)
         ])
     ],
     className='content'
@@ -444,7 +444,7 @@ def kpis(borough, accident_type, severity, year, month, radius_heatmap):
     fig_bar_years = px.bar(df_years, x=df_years.year, y=df_years.Count, title="Accidents by year",  color="year", text= "percentage")
     fig_bar_years.update_coloraxes(showscale = False)
     fig_bar_years.update_layout(
-        yaxis_title="ANumber of Accidents",
+        yaxis_title="Number of Accidents",
         xaxis_title="Year"
     )
 
@@ -455,7 +455,7 @@ def kpis(borough, accident_type, severity, year, month, radius_heatmap):
     fig_bar_hours.update_coloraxes(showscale = False)
     fig_bar_hours.update_layout(
         yaxis_title="Number of Accidents",
-        xaxis_title="Year"
+        xaxis_title="Hour"
     )
 
     # Stack time series year

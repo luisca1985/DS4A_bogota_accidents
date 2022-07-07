@@ -31,6 +31,7 @@ mapa_ejemplo = mapsample('Mapa de ejemplo', 'id_mapa_ejemplo')
 df, geo_df = get_data_cleaned()
 boroughs = sorted(df['borough'].unique())
 accident_types = sorted(df['accident_type'].unique())
+severity = sorted(df['severity'].unique())
 months = df['month'].cat.categories
 
 # Map Folium
@@ -222,6 +223,17 @@ check_accidents_type = html.Div(
     ]
 )
 
+check_severity = html.Div(
+    [
+        dbc.Checklist(
+            options=[{"label": sev.title(), "value": sev}
+                     for sev in severity],
+            value=[],
+            id="severity",
+        ),
+    ]
+)
+
 sidebar = html.Div(
     [
         # html.H4("Filters"),
@@ -245,6 +257,11 @@ sidebar = html.Div(
             "Accident type".upper()
         ),
         check_accidents_type,
+        html.Hr(),
+        html.H5(
+            "Severity".upper()
+        ),
+        check_severity,
 
     ],
     className='sidebar'
@@ -286,13 +303,16 @@ layout = dbc.Container(
     Output("map-folium", "srcDoc"),
     Input("borough", "value"),
     Input("accident-type", "value"),
+    Input("severity", "value"),
     Input("year", "value"),
     Input("month", "value"),
     Input('input-radius-heatmap', 'value'))
-def kpis(borough, accident_type, year, month, radius_heatmap):
+def kpis(borough, accident_type, severity, year, month, radius_heatmap):
     df2 = df[df['borough'].isin(borough)] if borough else df
     df2 = df2[df2['accident_type'].isin(
         accident_type)] if accident_type else df2
+    df2 = df2[df2['severity'].isin(
+        severity)] if severity else df2
     df2 = df2[df2['year'].isin(year)] if year else df2
     df2 = df2[df2['month'].isin(month)] if month else df2
 
@@ -429,7 +449,7 @@ def kpis(borough, accident_type, year, month, radius_heatmap):
         xaxis_title="Year"
     )
 
-    df_hour = df.groupby(['hour'])["Count"].sum()
+    df_hour = df2.groupby(['hour'])["Count"].sum()
     df_hour= DataFrame(df_hour).reset_index()
     df_hour = df_hour.sort_values("hour", ascending = True)
     fig_bar_hours= px.bar(df_hour, x=df_hour.hour, y=df_hour.Count, color="hour", title="Accidents by hour")

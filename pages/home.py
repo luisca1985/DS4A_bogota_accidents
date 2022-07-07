@@ -122,9 +122,9 @@ content = html.Div(
                     dbc.Col([
                         dcc.Graph(id="stack-time-series-week")
                     ], xl=12),
-                    dbc.Col([
-                        dcc.Graph(id="stack-time-series-day")
-                    ], xl=12)
+                    # dbc.Col([
+                    #     dcc.Graph(id="stack-time-series-day")
+                    # ], xl=12)
                 ], className='graph')
             ], xl=6, lg=12),
             dbc.Col([
@@ -136,9 +136,9 @@ content = html.Div(
                     dbc.Col([
                         dcc.Graph(id="time-series-week")
                     ], xl=12),
-                    dbc.Col([
-                        dcc.Graph(id="time-series-day")
-                    ], xl=12)
+                    # dbc.Col([
+                    #     dcc.Graph(id="time-series-day")
+                    # ], xl=12)
                 ], className='graph')
             ], xl=6, lg=12)
         ]),
@@ -293,10 +293,10 @@ layout = dbc.Container(
     Output("bar-hour", "figure"),
     Output("stack-time-series-month", "figure"),
     Output("stack-time-series-week", "figure"),
-    Output("stack-time-series-day", "figure"),
+    # Output("stack-time-series-day", "figure"),
     Output("time-series-month", "figure"),
     Output("time-series-week", "figure"),
-    Output("time-series-day", "figure"),
+    # Output("time-series-day", "figure"),
     Output("time-series-year-type", "figure"),
     Output("histogram", "figure"),
     Output("map-folium", "srcDoc"),
@@ -566,10 +566,10 @@ def kpis(borough, accident_type, severity, year, month, radius_heatmap):
         fig_bar_hours,
         fig_area_month_year,
         fig_area_week_year,
-        fig_area_day_year,
+        # fig_area_day_year,
         fig_line_month_year,
         fig_line_week_year,
-        fig_line_day_year,
+        # fig_line_day_year,
         fig_lines_year_acctypes,
         fig_histogram,
         html_map,

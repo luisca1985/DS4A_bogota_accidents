@@ -74,6 +74,18 @@ content = html.Div(
         ]),
         dbc.Row([
             dbc.Col([
+                html.H5('Geospatial Analysis'.upper(),
+                        className='graph-title'),
+                dcc.Graph(id="map", className='graph')
+            ], xl=6, lg=12),
+            dbc.Col([
+                html.H5('Borough Analysis'.upper(), className='graph-title'),
+                dcc.Graph(id="bar-borough", className='graph')
+
+            ], xl=6, lg=12)
+        ]),
+        dbc.Row([
+            dbc.Col([
                 html.H5('Heatmap Analysis'.upper(), className='graph-title'),
                 dbc.Row([
                     dbc.Col([
@@ -92,18 +104,6 @@ content = html.Div(
         ]),
         dbc.Row([
             dbc.Col([
-                html.H5('Accidents per Year'.upper(), className='graph-title'),
-                dcc.Graph(id="bar-month-year", className='graph')
-            ], xl=6, lg=12),
-            dbc.Col([
-                html.H5('Geospatial Analysis'.upper(),
-                        className='graph-title'),
-                dcc.Graph(id="map", className='graph')
-            ], xl=6, lg=12)
-
-        ]),
-        dbc.Row([
-            dbc.Col([
                 html.H5('Severity Analysis'.upper(), className='graph-title'),
                 dcc.Graph(id="bar-severity", className='graph')
             ], xl=3, lg=12),
@@ -113,10 +113,10 @@ content = html.Div(
                 dcc.Graph(id="bar-accident-type", className='graph')
             ], xl=3, lg=12),
             dbc.Col([
-                html.H5('Borough Analysis'.upper(), className='graph-title'),
-                dcc.Graph(id="bar-borough", className='graph')
-
+                html.H5('Accidents per Year'.upper(), className='graph-title'),
+                dcc.Graph(id="bar-month-year", className='graph')
             ], xl=6, lg=12)
+            
         ]),
         dbc.Row([
             dbc.Col([

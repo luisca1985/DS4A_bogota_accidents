@@ -148,15 +148,6 @@ content = html.Div(
                 dcc.Graph(id="bar-month-year", className='graph')
             ], xl=6, lg=12),
             dbc.Col([
-                html.H5('Histogram'.upper(),
-                        className='graph-title'),
-                dcc.Graph(id="histogram", className='graph')
-
-            ], xl=6, lg=12)
-
-        ]),
-        dbc.Row([
-            dbc.Col([
                 html.H5('Heatmap Analysis'.upper(), className='graph-title'),
                 dbc.Row([
                     dbc.Col([
@@ -166,6 +157,15 @@ content = html.Div(
                         dcc.Graph(id="heat-map-hour")
                     ], xl=6, lg=12)
                 ], className='graph')
+            ], xl=6, lg=12)
+
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.H5('Histogram'.upper(),
+                        className='graph-title'),
+                dcc.Graph(id="histogram", className='graph')
+
             ], xl=6, lg=12),
             dbc.Col([
                 html.H5('Hour Analysis'.upper(), className='graph-title'),

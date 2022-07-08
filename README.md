@@ -1,4 +1,9 @@
 # Bogotá Accidents
+
+## Github repository
+
+https://github.com/luisca1985/DS4A_bogota_accidents
+
 ## Prerequisites
 - [Install Git](https://git-scm.com/downloads)
 - [Install python 3](https://www.python.org/downloads/)
